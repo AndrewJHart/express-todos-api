@@ -3,14 +3,14 @@ const Todo = db.Todo;
 const Op = db.Sequelize.Op;
 
 /**
- * POST request handler for creation of a todo resource
+ * POST request handler for creation of a todoItem resource
  *
  * @param {Object} data
  * @returns {Promise<[<Object>]>}
  */
 const create = async data => {
     try {
-        await Todo.create(data);
+        return await Todo.create(data);
     } catch (e) {
         throw e;
     }
@@ -18,13 +18,16 @@ const create = async data => {
 
 /**
  *
- * @param {Number} id
- * @param {Object} data
- * @return {Promise<[number, Model[]]>}
+ * @param id
+ * @param data
+ * @return {Promise<*>}
  */
 const update = async (id, data) => {
     try {
-        return await Todo.update(data, { where: { id }});
+        await Todo.update(data, { where: { id }})
+        return await Todo.findByPk(id);
+
+        // return data;  // update was successful so return given data (unfortunately this does not return full obj)
     } catch (e) {
         throw e;
     }
@@ -35,7 +38,7 @@ const update = async (id, data) => {
  * params given in where clause as filters
  *
  * @param {Object} clause
- * @return {Promise<Model[]>}
+ * @returns {Promise<Model[]>}
  */
 const list = async clause => {
     try {
@@ -48,8 +51,10 @@ const list = async clause => {
 /**
  * Get resource by unique id / primary key
  *
+ * @note this will return null instead of catching as error
+ *      if nothing is found
  * @param {Number} id
- * @return {Promise<Model<any, TModelAttributes>>}
+ * @returns {Promise<Model<any, TModelAttributes>>}
  */
 const detail = async id => {
     try {
@@ -63,7 +68,7 @@ const detail = async id => {
  * Delete request - attempts to removes the resource
  *
  * @param {Number} id
- * @return {Promise<number>}
+ * @returns {Promise<number>}
  */
 const remove = async id => {
     try {

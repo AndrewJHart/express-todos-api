@@ -1,5 +1,7 @@
 const express = require('express');
 const TodosService = require('../services/todos');
+const isValid = require('../utils/utils').isValid;
+const coerce = require('../utils/utils').coerceYesNoToBool;
 const router = express.Router();  // instantiate router for this endpoint
 
 /**
@@ -17,16 +19,12 @@ router.post('/', (req, res) => {
         // relay call to Cerebro upstream predict service
         TodosService
             .create(req.body)
-            .then(data => {
-                console.log(data);
-
+            .then(response => {
                 return res.status(201).json({
-                    msg: 'created'
+                    ...response.dataValues
                 })
             })
             .catch(error => {
-                console.error(error);
-
                 return error?.status
                     ? res.status(error.status).json({
                         msg: error.statusText
@@ -44,22 +42,28 @@ router.post('/', (req, res) => {
 });
 
 /**
- * Not used, returns 405 in Restful fashion as endpoint
- * represents a resource but can not be communicated with
- * in this way
+ * Calls service to get list of all todoItems
+ * and allows for filtering with query params
+ * for the completed field (at present)
  *
  * @implements express.Router()
  * @method get - handler for http get requests
- * @returns {Response} 405 & json response
+ * @returns {Response} json response
  */
 router.get('/', (req, res) => {
     // check for query params used to filter on api
     const isCompleted = req.query?.completed;
-    const clause = isCompleted
-        ? {where: {'completed': isCompleted}}
-        : {};
+    const priority = req.query?.priority;
+    let clause = {
+        where: {}
+    };
+    // const clause = isCompleted
+    //     ? {where: {'completed': isCompleted}}
+    //     : {};
 
-    // todo should return bad request if iscompleted is not boolean
+    clause = typeof isCompleted === 'string' && isValid(isCompleted)
+        ? clause.where = { 'completed': coerce(isCompleted) }
+        : clause
 
     return TodosService
         .list(clause)
@@ -79,7 +83,11 @@ router.get('/:id', (req, res) => {
         ? res.status(401).json({ msg: 'Bad Request' })
         : TodosService
             .detail(id)
-            .then(data => res.send(data))
+            .then(result => {
+                return result
+                    ? res.send(result)
+                    : res.status(404).json({ msg: '404 Not Found' });
+            })
             .catch(error => {
                 return res.status(500).json({
                     msg: 'Server Error',
@@ -104,7 +112,10 @@ router.put('/:id', (req, res) => {
         ? res.status(401).json({ msg: 'Bad Request' })
         : TodosService
             .update(id, req.body)
-            .then(data => res.json(data))
+            .then(data => {
+                console.log(data);
+                res.json(data)
+            })
             .catch(err => {
                 return res.status(500).json({
                     msg: 'Server Error',
