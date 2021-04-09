@@ -1,0 +1,28 @@
+{
+  "name": "diversy-api",
+  "version": "0.9.4",
+  "private": true,
+  "scripts": {
+    "start": "node bin/www",
+    "dev": "DEBUG=diversy-api:* CACHE_DEBUG=TRUE nodemon node src/bin/www",
+    "test": "echo No Unit Tests",
+    "build": "rm -rf ./build && mkdir -p ./build && cp -R ./src/* ./build && cp ./package.json ./build"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "body-parser": "^1.19.0",
+    "btoa": "^1.2.1",
+    "cors": "^2.8.5",
+    "debug": "~2.6.9",
+    "dotenv": "^8.2.0",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "memory-cache": "^0.2.0",
+    "morgan": "~1.9.1",
+    "pg": "^8.5.1",
+    "pg-hstore": "^2.3.3",
+    "querystring": "^0.2.0",
+    "retry-axios": "^2.4.0",
+    "sequelize": "^6.6.2"
+  }
+}

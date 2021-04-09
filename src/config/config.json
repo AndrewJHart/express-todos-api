@@ -1,0 +1,17 @@
+{
+  "development": {
+    "username": "a0h015z",
+    "password": null,
+    "database": "diversydb",
+    "host": "127.0.0.1",
+    "port": "5433",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "root",
+    "password": null,
+    "database": "todos_prod",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  }
+}
