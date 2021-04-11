@@ -6,9 +6,6 @@
 .env
 .env.test
 
-# Build
-/build
-
 # Node
 /node_modules
 

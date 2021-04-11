@@ -10,7 +10,7 @@ const Op = db.Sequelize.Op;
  */
 const create = async data => {
     try {
-        return await Todo.create(data);
+        return await Todo.create(data)
     } catch (e) {
         throw e;
     }
@@ -25,7 +25,7 @@ const create = async data => {
 const update = async (id, data) => {
     try {
         await Todo.update(data, { where: { id }})
-        return await Todo.findByPk(id);
+        return await Todo.findByPk(id, { attributes: { exclude: ['user'] }});
 
         // return data;  // update was successful so return given data (unfortunately this does not return full obj)
     } catch (e) {
@@ -42,7 +42,7 @@ const update = async (id, data) => {
  */
 const list = async clause => {
     try {
-        return await Todo.findAll(clause);
+        return await Todo.findAll({ ...clause, attributes: { exclude: ['user'] }});
     } catch (e) {
         throw e;
     }
@@ -58,7 +58,7 @@ const list = async clause => {
  */
 const detail = async id => {
     try {
-        return await Todo.findByPk(id);
+        return await Todo.findByPk(id, { attributes: { exclude: ['user'] }});
     } catch (e) {
         throw e;
     }

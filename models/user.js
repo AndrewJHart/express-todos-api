@@ -1,15 +1,9 @@
 'use strict';
-const { Model } = require('sequelize');
-
-/**
- * Todos model
- *
- * @param sequelize
- * @param DataTypes
- * @return {Object} TodoModel
- */
+const {
+  Model
+} = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Todo extends Model {
+  class User extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -18,24 +12,29 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
     }
-  }
+  };
 
-  Todo.init({
-    title: {
+  User.init({
+    username: {
       type: DataTypes.STRING,
       allowNull: false
     },
-    details: DataTypes.STRING,
-    completed: {
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    isAdmin: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     }
   }, {
     sequelize,
-    modelName: 'Todo',
+    modelName: 'User',
   });
 
-  return Todo;
+  return User;
 };
-
-// module.exports = getModel;

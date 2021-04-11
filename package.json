@@ -4,21 +4,25 @@
   "private": true,
   "scripts": {
     "start": "node bin/www",
-    "dev": "DEBUG=diversy-api:* CACHE_DEBUG=TRUE nodemon node src/bin/www",
-    "test": "echo No Unit Tests",
-    "build": "rm -rf ./build && mkdir -p ./build && cp -R ./src/* ./build && cp ./package.json ./build"
+    "dev": "DEBUG=diversy-api:* CACHE_DEBUG=TRUE nodemon node bin/www",
+    "test": "echo No Unit Tests"
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "bcrypt": "^5.0.1",
     "body-parser": "^1.19.0",
     "btoa": "^1.2.1",
     "cors": "^2.8.5",
     "debug": "~2.6.9",
     "dotenv": "^8.2.0",
     "express": "~4.16.1",
+    "express-query-boolean": "^2.0.0",
     "http-errors": "~1.6.3",
+    "jsonwebtoken": "^8.5.1",
     "memory-cache": "^0.2.0",
     "morgan": "~1.9.1",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
     "pg": "^8.5.1",
     "pg-hstore": "^2.3.3",
     "querystring": "^0.2.0",

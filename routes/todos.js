@@ -1,7 +1,6 @@
 const express = require('express');
+const passport = require('passport');
 const TodosService = require('../services/todos');
-const isValid = require('../utils/utils').isValid;
-const coerce = require('../utils/utils').coerceYesNoToBool;
 const router = express.Router();  // instantiate router for this endpoint
 
 /**
@@ -13,12 +12,15 @@ const router = express.Router();  // instantiate router for this endpoint
  * @method POST - handler for http POST requests from the frontend
  * @returns {Response} json response
  */
-router.post('/', (req, res) => {
+router.post('/', passport.authenticate('jwt', { session: false }), (req, res) => {
+    // get user id for current authenticated request & use it for query
+    const user = req.user.id;
+    const title = req.body?.title || null;
+
     // ensure body is valid as title is only required field
-    if (req.body?.title) {
-        // relay call to Cerebro upstream predict service
+    if (title && user) {
         TodosService
-            .create(req.body)
+            .create({ title, user })
             .then(response => {
                 return res.status(201).json({
                     ...response.dataValues
@@ -50,29 +52,24 @@ router.post('/', (req, res) => {
  * @method get - handler for http get requests
  * @returns {Response} json response
  */
-router.get('/', (req, res) => {
-    // check for query params used to filter on api
-    const isCompleted = req.query?.completed;
-    const priority = req.query?.priority;
-    let clause = {
-        where: {}
-    };
-    // const clause = isCompleted
-    //     ? {where: {'completed': isCompleted}}
-    //     : {};
+router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => {
+    // get user id for current authenticated request & use it for query
+    const userId = req.user.id;
 
-    clause = typeof isCompleted === 'string' && isValid(isCompleted)
-        ? clause.where = { 'completed': coerce(isCompleted) }
-        : clause
+    // build clause from query params
+    // note - some sanitization should be added
+    const clause = {
+        where: { ...req.query, user: userId }
+    };
 
     return TodosService
         .list(clause)
-        .then(data => res.send(data))
-        .catch(() =>
-            res.status(500).json({
-                msg: 'Server Error',
-            })
-        );
+            .then(data => res.send(data))
+            .catch((_) =>
+                res.status(500).json({
+                    msg: 'Server Error',
+                })
+            );
 });
 
 
@@ -80,7 +77,7 @@ router.get('/:id', (req, res) => {
     const id = req.params?.id && Number(req.params.id);
 
     Number.isNaN(id)
-        ? res.status(401).json({ msg: 'Bad Request' })
+        ? res.status(400).json({ msg: 'Bad Request' })
         : TodosService
             .detail(id)
             .then(result => {
@@ -97,25 +94,20 @@ router.get('/:id', (req, res) => {
 });
 
 /**
- * Not used, returns 405 in Restful fashion as endpoint
- * represents a resource but can not be communicated with
- * in this way
+ * Gets detail data for single resource
  *
  * @implements express.Router()
  * @method put - handler for http update requests
- * @returns {Response} 405 & json response
+ * @returns {Response} json response
  */
 router.put('/:id', (req, res) => {
     const id = req.params?.id && Number(req.params.id);
 
     Number.isNaN(id)
-        ? res.status(401).json({ msg: 'Bad Request' })
+        ? res.status(400).json({ msg: 'Bad Request' })
         : TodosService
             .update(id, req.body)
-            .then(data => {
-                console.log(data);
-                res.json(data)
-            })
+            .then(data => res.json(data))
             .catch(err => {
                 return res.status(500).json({
                     msg: 'Server Error',
@@ -125,19 +117,17 @@ router.put('/:id', (req, res) => {
 });
 
 /**
- * Not used, returns 405 in Restful fashion as endpoint
- * represents a resource but can not be communicated with
- * in this way
+ * deletes a single resource
  *
  * @implements express.Router()
  * @method delete - handler for http delete requests
- * @returns {Response} 405 & json response
+ * @returns {Response} json response
  */
 router.delete('/:id', (req, res) => {
     const id = req.params?.id && Number(req.params.id);
 
     Number.isNaN(id)
-        ? res.status(401).json({ msg: 'Bad Request' })
+        ? res.status(400).json({ msg: 'Bad Request' })
         : TodosService
             .remove(id)
             .then(response => {
