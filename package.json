@@ -27,6 +27,7 @@
     "pg-hstore": "^2.3.3",
     "querystring": "^0.2.0",
     "retry-axios": "^2.4.0",
-    "sequelize": "^6.6.2"
+    "sequelize": "^6.6.2",
+    "sequelize-cli": "^6.2.0"
   }
 }
